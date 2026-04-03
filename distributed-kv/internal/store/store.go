@@ -21,6 +21,7 @@ func NewStore() *Store {
 	}
 }
 
+// Client write: generate the next logical version locally.
 func (s *Store) Set(key string, value string) (model.VersionedValue, error) {
 	if key == "" {
 		return model.VersionedValue{}, ErrEmptyKey
@@ -42,6 +43,28 @@ func (s *Store) Set(key string, value string) (model.VersionedValue, error) {
 
 	s.data[key] = v
 	return v, nil
+}
+
+// Replication write: apply the version provided by the leader/coordinator.
+func (s *Store) ApplyReplication(key string, value string, version int64) error {
+	if key == "" {
+		return ErrEmptyKey
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	current, exists := s.data[key]
+	if exists && current.Version > version {
+		return nil
+	}
+
+	s.data[key] = model.VersionedValue{
+		Value:   value,
+		Version: version,
+	}
+
+	return nil
 }
 
 func (s *Store) Get(key string) (model.VersionedValue, error) {
