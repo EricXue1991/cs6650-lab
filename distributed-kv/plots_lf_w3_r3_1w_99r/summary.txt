@@ -1,0 +1,10 @@
+total_requests: 300
+total_reads: 299
+total_writes: 1
+successful_reads: 299
+successful_writes: 1
+stale_reads: 0
+avg_read_latency_ms: 207.91058528428096
+avg_write_latency_ms: 1212.841
+p95_read_latency_ms: 209.5094
+p95_write_latency_ms: 1212.841
